@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Concepto de contenedores | Plataforma de cursos</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <a class="brand" href="/courses/1">Volver al curso</a>
+          <div class="nav-links">
+            <a class="btn btn-secondary" href="/dashboard">Panel</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="badge">Contenedores y despliegue</span>
+          <h1>Concepto de contenedores</h1>
+          <p class="muted">Un contenedor empaqueta una aplicación y sus dependencias para que se ejecute igual en cualquier entorno.</p>
+          <!-- Botones superiores eliminados: navegación principal está en la parte inferior -->
+        </div>
+        
+          <img class="course-image" src="https://images.unsplash.com/photo-1542223616-1b0b3f6f9f7c?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Concepto de contenedores" />
+        
+      </section>
+
+      <section class="card module-content-card">
+        
+      <div class="module-body">
+        <p class="module-summary">Concepto de contenedores</p>
+        <div class="module-detail-rich">
+          
+      <p>Este módulo introduce los contenedores como una unidad de despliegue ligera que encapsula la aplicación y sus dependencias. En TI, este enfoque permite trabajar con entornos reproducibles, reducir diferencias entre desarrollo y producción y acelerar el tiempo de entrega. Este párrafo introduce el módulo y enmarca su utilidad práctica para proyectos de TI.</p>
+      <p class="citation"><cite><a href="https://docs.docker.com/" target="_blank" rel="noopener noreferrer">Documentación Docker</a></cite></p>
+    
+      <p>Aquí aportamos contexto técnico: conceptos, limitaciones y escenarios de uso que ayudan a evaluar decisiones de diseño en entornos productivos.</p>
+      <p class="citation"><cite><a href="https://opencontainers.org/" target="_blank" rel="noopener noreferrer">OCI (Open Container Initiative)</a></cite></p>
+    
+      <p>Se incluyen consideraciones de seguridad y resiliencia para que el estudiante entienda riesgos y medidas de mitigación en la operación real.</p>
+      <p class="citation"><cite><a href="https://kubernetes.io/docs/concepts/" target="_blank" rel="noopener noreferrer">Kubernetes Concepts</a></cite></p>
+    
+      <p>Ejemplos de integración con pipelines y herramientas comunes permiten conectar la teoría con prácticas reproducibles en desarrollo y despliegue.</p>
+      <p class="citation"><cite><a href="https://snyk.io/learn/docker-security-best-practices/" target="_blank" rel="noopener noreferrer">Guía de imágenes seguras</a></cite></p>
+    
+      <p>Al final del módulo proponemos referencias y pasos de seguimiento para profundizar en las fuentes oficiales y documentación técnica.</p>
+      <p class="citation"><cite><a href="https://docs.github.com/en/actions" target="_blank" rel="noopener noreferrer">Buenas prácticas CI/CD</a></cite></p>
+    
+        </div>
+        <div class="module-highlights">
+          <h4>Conceptos clave</h4>
+          <ul class="module-points"><li>Aísla dependencias del sistema host</li><li>Reduce problemas de compatibilidad</li><li>Facilita la replicación del entorno</li></ul>
+        </div>
+        <div class="module-gallery">
+          <img src="https://images.unsplash.com/photo-1542223616-1b0b3f6f9f7c?auto=format&fit=crop&w=900&q=80" alt="Infraestructura basada en contenedores" class="module-image" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=900&q=80" alt="Desarrollo de software con tecnología cloud" class="module-image" loading="lazy" />
+        </div>
+        <p class="module-outcome">Comprenderás por qué los contenedores aceleran el desarrollo y reducen fallos de compatibilidad.</p>
+      </div>
+    
+      </section>
+
+      <section class="module-navigation">
+        
+        
+          <a class="btn btn-primary btn-next-module" href="/themes/2" data-next-url="/themes/2" data-progress="20">Siguiente módulo</a>
+        
+      </section>
+
+      
+
+      <div class="next-module-overlay" id="nextModuleOverlay" aria-hidden="true">
+        <div class="next-module-ring" role="status" aria-live="polite">
+          <svg class="progress-ring" width="180" height="180" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="bg" cx="60" cy="60" r="52"></circle>
+            <circle class="progress" id="progressCircle" cx="60" cy="60" r="52" stroke-dasharray="326.7256" stroke-dashoffset="326.7256"></circle>
+          </svg>
+          <div class="ring-text"><span id="nextModuleText">Avance 0%</span></div>
+        </div>
+      </div>
+
+      <script>
+        document.querySelectorAll('.btn-next-module').forEach((button) => {
+          button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const overlay = document.getElementById('nextModuleOverlay');
+            const text = document.getElementById('nextModuleText');
+            const progressCircle = document.getElementById('progressCircle');
+            const progress = parseInt(button.dataset.progress || '0', 10);
+            if (overlay && text && progressCircle) {
+              text.textContent = `Avance ${progress}%`;
+              overlay.classList.remove('show');
+              requestAnimationFrame(() => {
+                overlay.classList.add('show');
+                // calcular desplazamiento del anillo según progreso
+                const r = parseFloat(progressCircle.getAttribute('r'));
+                const c = 2 * Math.PI * r;
+                const offset = Math.max(0, c * (1 - (progress / 100)));
+                progressCircle.style.transition = 'stroke-dashoffset 1s ease';
+                progressCircle.style.strokeDasharray = c;
+                progressCircle.style.strokeDashoffset = offset;
+                // esperar 1s (duración de la animación) antes de redirigir
+                window.setTimeout(() => {
+                  window.location.href = button.dataset.nextUrl;
+                }, 1000);
+              });
+            } else {
+              window.location.href = button.dataset.nextUrl;
+            }
+          });
+        });
+      </script>
+    </main>
+  </body>
+</html>

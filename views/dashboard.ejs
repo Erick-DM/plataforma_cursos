@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | Plataforma de cursos</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <a class="brand" href="/">Unidad IV · Desarrollo Web</a>
+          <div class="nav-links">
+            <a class="btn btn-danger" href="/logout">Cerrar sesión</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="badge">Bienvenido</span>
+          <h1>Hola <%= user.name %>, tu ruta de aprendizaje está lista</h1>
+          <p>Cada curso cuenta con 10 módulos, videos integrados y un examen que solo se desbloquea después de ver todo el temario.</p>
+          <% if (message) { %><p class="muted"><%= message %></p><% } %>
+          <% if (user && user.role === 'admin') { %>
+            <div class="inline-list" style="margin-top: 1rem;">
+              <a class="btn btn-primary" href="/admin/courses/new">Añadir curso</a>
+            </div>
+          <% } %>
+        </div>
+        <img src="/images/cloud.svg" alt="Progreso del curso" />
+      </section>
+
+      <section class="course-grid">
+        <% courses.forEach((course) => { %>
+          <div class="card course-card">
+            <img class="course-image" src="<%= course.image %>" alt="<%= course.title %>" />
+            <span class="badge"><%= course.level %></span>
+            <h3><%= course.title %></h3>
+            <p class="muted"><%= course.description %></p>
+            <div class="status-pill <%= course.locked ? 'locked' : (course.progress && course.progress.completed ? 'pass' : '') %>">
+              <%= course.locked ? 'Bloqueado' : (course.progress && course.progress.completed ? 'Aprobado' : 'En progreso') %>
+            </div>
+            <div class="progress-track">
+              <div class="progress-bar" style="width: <%= course.progressPercent %>%;"></div>
+            </div>
+            <p class="muted">Temas vistos: <%= course.viewedThemes %> / <%= course.totalThemes %> · Progreso: <%= course.progressPercent %>%</p>
+            <% if (course.locked) { %>
+              <a class="btn btn-secondary" href="#">Esperando aprobación</a>
+            <% } else { %>
+              <a class="btn btn-primary" href="/courses/<%= course.id %>">Ingresar al curso</a>
+            <% } %>
+          </div>
+        <% }) %>
+      </section>
+    </main>
+  </body>
+</html>

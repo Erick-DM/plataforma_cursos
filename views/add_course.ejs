@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | Plataforma de cursos</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <a class="brand" href="/dashboard">Volver al panel</a>
+          <div class="nav-links">
+            <a class="btn btn-secondary" href="/logout">Cerrar sesión</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="badge">Administrador</span>
+          <h1>Agregar un nuevo curso</h1>
+          <p class="muted">Completa los datos básicos y el sistema creará un curso con un módulo introductorio listo para trabajar.</p>
+          <% if (message) { %><p class="muted"><%= message %></p><% } %>
+        </div>
+      </section>
+
+      <section class="card form-card">
+        <form action="/admin/courses" method="post" class="form-grid">
+          <label>
+            Título del curso
+            <input class="input" type="text" name="title" required placeholder="Ej. DevOps y automatización" />
+          </label>
+          <label>
+            Identificador (opcional)
+            <input class="input" type="text" name="slug" placeholder="devops-automatizacion" />
+          </label>
+          <label>
+            Descripción
+            <textarea class="input" name="description" rows="4" required placeholder="Describe brevemente el contenido del curso"></textarea>
+          </label>
+          <label>
+            Nivel
+            <select class="input" name="level">
+              <option value="Básico">Básico</option>
+              <option value="Intermedio">Intermedio</option>
+              <option value="Avanzado">Avanzado</option>
+            </select>
+          </label>
+          <label>
+            Imagen (opcional)
+            <input class="input" type="text" name="image" placeholder="/images/cloud.svg" />
+          </label>
+          <button class="btn btn-primary" type="submit">Crear curso</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

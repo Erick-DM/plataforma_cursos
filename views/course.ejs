@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | Plataforma de cursos</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <a class="brand" href="/dashboard">Volver al panel</a>
+          <div class="nav-links">
+            <a class="btn btn-secondary" href="/logout">Salir</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="badge"><%= course.level %></span>
+          <h1><%= course.title %></h1>
+          <p><%= course.description %></p>
+          <div class="inline-list">
+            <% if (allViewed) { %>
+              <a class="btn btn-primary" href="/courses/<%= course.id %>/quiz">Responder examen</a>
+            <% } else { %>
+              <a class="btn btn-secondary" href="#">Examen bloqueado</a>
+            <% } %>
+            <a class="btn btn-secondary" href="/dashboard">Regresar</a>
+          </div>
+          <% if (message) { %><p class="muted"><%= message %></p><% } %>
+        </div>
+        <div class="panel card">
+          <h3>Progreso del curso</h3>
+          <svg class="progress-ring" viewBox="0 0 120 120" role="img" aria-label="Progreso del curso">
+            <circle class="bg" cx="60" cy="60" r="48"></circle>
+            <circle class="progress" cx="60" cy="60" r="48" stroke-dasharray="301.59" stroke-dashoffset="<%= 301.59 - (301.59 * progressPercent / 100) %>"></circle>
+          </svg>
+          <p class="muted">Temas revisados: <%= viewedThemes %> / <%= totalThemes %></p>
+          <% if (progress && progress.score) { %>
+            <p class="muted">Última calificación: <strong><%= progress.score %></strong></p>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="module-list">
+        <% themes.forEach((theme) => { %>
+          <article class="module-card module-card--course">
+            <% if (theme.image1) { %>
+              <img class="module-thumb" src="<%= theme.image1 %>" alt="<%= theme.title %>" />
+            <% } %>
+            <div class="module-card-content">
+              <span class="badge">Módulo</span>
+              <h3><%= theme.title %></h3>
+              <p class="muted"><%= theme.summary || theme.content %></p>
+              <a class="btn btn-secondary" href="/themes/<%= theme.id %>">Ver módulo</a>
+            </div>
+          </article>
+        <% }) %>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | Plataforma de cursos</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <a class="brand" href="/courses/<%= course.id %>">Volver al curso</a>
+          <div class="nav-links">
+            <a class="btn btn-secondary" href="/dashboard">Panel</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="badge"><%= course.title %></span>
+          <h1><%= theme.title %></h1>
+          <p class="muted"><%= theme.summary || theme.content %></p>
+          <!-- Botones superiores eliminados: navegación principal está en la parte inferior -->
+        </div>
+        <% if (theme.image1) { %>
+          <img class="course-image" src="<%= theme.image1 %>" alt="<%= theme.title %>" />
+        <% } else { %>
+          <img src="/images/testing.svg" alt="Detalle del módulo" />
+        <% } %>
+      </section>
+
+      <section class="card module-content-card">
+        <%- theme.info_html || theme.content %>
+      </section>
+
+      <section class="module-navigation">
+        <% if (previousTheme) { %>
+          <a class="btn btn-secondary" href="/themes/<%= previousTheme.id %>">Módulo anterior</a>
+        <% } %>
+        <% if (nextTheme) { %>
+          <a class="btn btn-primary btn-next-module" href="/themes/<%= nextTheme.id %>" data-next-url="/themes/<%= nextTheme.id %>" data-progress="<%= Math.round(((currentThemeIndex + 1) / totalThemes) * 100) %>">Siguiente módulo</a>
+        <% } else { %>
+          <a class="btn btn-primary" href="/courses/<%= course.id %>">Volver al curso</a>
+        <% } %>
+      </section>
+
+      <% if (showCourseVideo) { %>
+        <section class="card">
+          <div class="video-header">
+            <div>
+              <span class="badge">Video del curso</span>
+              <h3>Explicación visual previa a la última lección</h3>
+            </div>
+            <% if (videoInfo && videoInfo.title) { %>
+              <p class="muted"><%= videoInfo.title %></p>
+            <% } %>
+          </div>
+          <iframe class="video-frame" src="<%= videoEmbedUrl %>" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </section>
+      <% } %>
+
+      <div class="next-module-overlay" id="nextModuleOverlay" aria-hidden="true">
+        <div class="next-module-ring" role="status" aria-live="polite">
+          <svg class="progress-ring" width="180" height="180" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="bg" cx="60" cy="60" r="52"></circle>
+            <circle class="progress" id="progressCircle" cx="60" cy="60" r="52" stroke-dasharray="326.7256" stroke-dashoffset="326.7256"></circle>
+          </svg>
+          <div class="ring-text"><span id="nextModuleText">Avance 0%</span></div>
+        </div>
+      </div>
+
+      <script>
+        document.querySelectorAll('.btn-next-module').forEach((button) => {
+          button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const overlay = document.getElementById('nextModuleOverlay');
+            const text = document.getElementById('nextModuleText');
+            const progressCircle = document.getElementById('progressCircle');
+            const progress = parseInt(button.dataset.progress || '0', 10);
+            if (overlay && text && progressCircle) {
+              text.textContent = `Avance ${progress}%`;
+              overlay.classList.remove('show');
+              requestAnimationFrame(() => {
+                overlay.classList.add('show');
+                // calcular desplazamiento del anillo según progreso
+                const r = parseFloat(progressCircle.getAttribute('r'));
+                const c = 2 * Math.PI * r;
+                const offset = Math.max(0, c * (1 - (progress / 100)));
+                progressCircle.style.transition = 'stroke-dashoffset 1s ease';
+                progressCircle.style.strokeDasharray = c;
+                progressCircle.style.strokeDashoffset = offset;
+                // esperar 1s (duración de la animación) antes de redirigir
+                window.setTimeout(() => {
+                  window.location.href = button.dataset.nextUrl;
+                }, 1000);
+              });
+            } else {
+              window.location.href = button.dataset.nextUrl;
+            }
+          });
+        });
+      </script>
+    </main>
+  </body>
+</html>

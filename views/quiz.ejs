@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | Plataforma de cursos</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <a class="brand" href="/courses/<%= course.id %>">Volver al curso</a>
+          <div class="nav-links">
+            <a class="btn btn-secondary" href="/dashboard">Panel</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="badge">Evaluación final</span>
+          <h1><%= course.title %></h1>
+          <p>Esta evaluación contiene 10 preguntas y 3 opciones por pregunta. Solo podrás presentarla cuando hayas terminado todos los módulos.</p>
+        </div>
+        <img src="/images/docs.svg" alt="Evaluación del curso" />
+      </section>
+
+      <% if (result) { %>
+        <div class="result-banner">
+          <h3>Resultado: <%= result.score %> / 100</h3>
+          <p>Respondiste correctamente <%= result.correct %> de <%= result.total %> preguntas.</p>
+          <% if (result.passed) { %>
+            <p><strong>¡Aprobaste el curso!</strong></p>
+          <% } else { %>
+            <p><strong>Intentar de nuevo</strong></p>
+          <% } %>
+        </div>
+      <% } %>
+
+      <form method="POST" action="/courses/<%= course.id %>/quiz">
+        <div class="quiz-list">
+          <% questions.forEach((question, index) => { %>
+            <div class="quiz-card">
+              <h3><%= index + 1 %>. <%= question.prompt %></h3>
+              <% question.options.forEach((option) => { %>
+                <label style="display:block; margin:0.35rem 0;">
+                  <input type="radio" name="q<%= index %>" value="<%= option %>" required />
+                  <%= option %>
+                </label>
+              <% }) %>
+            </div>
+          <% }) %>
+        </div>
+        <button class="btn btn-primary" type="submit">Finalizar examen</button>
+      </form>
+
+      <% if (modalOpen) { %>
+        <div class="modal-backdrop">
+          <div class="modal">
+            <h2><%= result.passed ? '¡Aprobaste el curso!' : 'Intentar de nuevo' %></h2>
+            <p>Tu calificación fue <strong><%= result.score %></strong> puntos.</p>
+            <% if (result.passed) { %>
+              <div class="modal-actions">
+                <% if (result.nextCourse) { %>
+                  <a class="btn btn-primary" href="/courses/<%= result.nextCourse.id %>">Siguiente curso</a>
+                <% } %>
+                <a class="btn btn-secondary" href="/courses/<%= course.id %>">Regresar al curso</a>
+              </div>
+            <% } else { %>
+              <div class="modal-actions">
+                <a class="btn btn-secondary" href="/courses/<%= course.id %>">Regresar al curso</a>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+    </main>
+  </body>
+</html>
