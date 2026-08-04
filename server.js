@@ -777,9 +777,47 @@ app.post('/admin/courses', requireAuth, (req, res) => {
   db.prepare('INSERT INTO themes (course_id, title, content, video_url, theme_order, summary, info_html, image1, image2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
     .run(courseRecord.id, defaultModule.title, builtModule.summary, builtModule.video_url, 1, builtModule.summary, builtModule.info_html, builtModule.image1, builtModule.image2);
 
-  req.session.message = 'Curso creado correctamente.';
-  return res.redirect('/dashboard');
-});
+    req.session.message = 'Curso creado correctamente.';
+    return res.redirect('/dashboard');
+    });
+    
+    // ==========================================
+    // RUTAS DE ADMINISTRACIÓN: CONTROL DE USUARIOS
+    // ==========================================
+    
+    // 1. Mostrar la lista de usuarios
+    app.get('/admin/users', (req, res) => {
+      const users = db.prepare('SELECT id, name, email, role FROM users').all();
+      res.render('users_control', { users });
+    });
+    
+    // 2. Actualizar datos, rol o contraseña de un usuario
+    app.post('/admin/users/update/:id', (req, res) => {
+      const { id } = req.params;
+      const { name, email, role, new_password } = req.body;
+    
+      if (new_password && new_password.trim() !== '') {
+        const hashedPassword = bcrypt.hashSync(new_password.trim(), 10);
+        db.prepare('UPDATE users SET name = ?, email = ?, role = ?, password = ? WHERE id = ?')
+          .run(name, email.toLowerCase(), role, hashedPassword, id);
+      } else {
+        db.prepare('UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?')
+          .run(name, email.toLowerCase(), role, id);
+      }
+    
+      res.redirect('/admin/users');
+    });
+    
+    // 3. Eliminar usuario
+    app.post('/admin/users/delete/:id', (req, res) => {
+      const { id } = req.params;
+      db.prepare('DELETE FROM users WHERE id = ?').run(id);
+      res.redirect('/admin/users');
+    });
+    
+    app.listen(port, () => {
+      console.log(`Aplicación lista en http://localhost:${port}`);
+    });
 
 app.listen(port, () => {
   console.log(`Aplicación lista en http://localhost:${port}`);

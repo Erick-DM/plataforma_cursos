@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Usuarios | Plataforma de Cursos</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a class="brand" href="/dashboard">Unidad IV · Desarrollo Web</a>
+        <div class="nav-links">
+          <a class="btn btn-secondary" href="/dashboard">← Volver al inicio</a>
+          <a class="btn btn-danger" href="/logout">Cerrar sesión</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" style="margin-bottom: 2rem;">
+      <div class="hero-card">
+        <span class="badge">Administración</span>
+        <h1>Panel de Control de Usuarios</h1>
+        <p>Gestión de roles, actualización de credenciales y permisos de la plataforma.</p>
+      </div>
+    </section>
+
+    <section class="card" style="padding: 1.5rem; overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-color, #333);">
+            <th style="padding: 12px;">ID</th>
+            <th style="padding: 12px;">Nombre</th>
+            <th style="padding: 12px;">Correo Electrónico</th>
+            <th style="padding: 12px;">Rol</th>
+            <th style="padding: 12px;">Nueva Contraseña</th>
+            <th style="padding: 12px;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(u => { %>
+            <tr style="border-bottom: 1px solid var(--border-color, #222);">
+              <form action="/admin/users/update" method="POST">
+                <input type="hidden" name="id" value="<%= u.id %>" />
+                <td style="padding: 12px;"><%= u.id %></td>
+                <td style="padding: 12px;">
+                  <input type="text" name="name" value="<%= u.name %>" required style="padding: 6px; border-radius: 4px; border: 1px solid #444; background: #1a1a1a; color: white;" />
+                </td>
+                <td style="padding: 12px;">
+                  <input type="email" name="email" value="<%= u.email %>" required style="padding: 6px; border-radius: 4px; border: 1px solid #444; background: #1a1a1a; color: white;" />
+                </td>
+                <td style="padding: 12px;">
+                  <select name="role" style="padding: 6px; border-radius: 4px; border: 1px solid #444; background: #1a1a1a; color: white;">
+                    <option value="student" <%= u.role === 'student' ? 'selected' : '' %>>Estudiante</option>
+                    <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Administrador</option>
+                  </select>
+                </td>
+                <td style="padding: 12px;">
+                  <input type="password" name="password" placeholder="Opcional" style="padding: 6px; border-radius: 4px; border: 1px solid #444; background: #1a1a1a; color: white;" />
+                </td>
+                <td style="padding: 12px; display: flex; gap: 8px;">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+              </form>
+                  <form action="/admin/users/delete" method="POST" onsubmit="return confirm('¿Eliminar usuario?');">
+                    <input type="hidden" name="id" value="<%= u.id %>" />
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                  </form>
+                </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

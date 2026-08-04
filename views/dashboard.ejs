@@ -24,10 +24,15 @@
           <span class="badge">Bienvenido</span>
           <h1>Hola <%= user.name %>, tu ruta de aprendizaje está lista</h1>
           <p>Cada curso cuenta con 10 módulos, videos integrados y un examen que solo se desbloquea después de ver todo el temario.</p>
-          <% if (message) { %><p class="muted"><%= message %></p><% } %>
-          <% if (user && user.role === 'admin') { %>
+
+          <% if (typeof message !== 'undefined' && message) { %>
+            <p class="muted"><%= message %></p>
+          <% } %>
+
+          <% if (user && (user.role === 'admin' || user.role === 'Admin')) { %>
             <div class="inline-list" style="margin-top: 1rem;">
               <a class="btn btn-primary" href="/admin/courses/new">Añadir curso</a>
+              <a class="btn" href="/admin/users" style="background: #3498db; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">⚙️ Control de Usuarios</a>
             </div>
           <% } %>
         </div>
@@ -41,13 +46,17 @@
             <span class="badge"><%= course.level %></span>
             <h3><%= course.title %></h3>
             <p class="muted"><%= course.description %></p>
+
             <div class="status-pill <%= course.locked ? 'locked' : (course.progress && course.progress.completed ? 'pass' : '') %>">
               <%= course.locked ? 'Bloqueado' : (course.progress && course.progress.completed ? 'Aprobado' : 'En progreso') %>
             </div>
+
             <div class="progress-track">
-              <div class="progress-bar" style="width: <%= course.progressPercent %>%;"></div>
+              <div class="progress-bar" style="--progress: <%= course.progressPercent %>%; width: var(--progress);"></div>
             </div>
+
             <p class="muted">Temas vistos: <%= course.viewedThemes %> / <%= course.totalThemes %> · Progreso: <%= course.progressPercent %>%</p>
+
             <% if (course.locked) { %>
               <a class="btn btn-secondary" href="#">Esperando aprobación</a>
             <% } else { %>
