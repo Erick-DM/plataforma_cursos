@@ -37,24 +37,25 @@
         <%- theme.info_html || theme.content %>
       </section>
 
-      <!-- SECCIÓN DE VIDEO: Posicionada antes de la navegación -->
+      <!-- SECCIÓN DE VIDEO: Solo visible en el ÚLTIMO módulo (!nextTheme) -->
       <% 
-        // Determinar URL del video desde la vista o desde el objeto theme
         let currentVideoUrl = typeof videoEmbedUrl !== 'undefined' && videoEmbedUrl ? videoEmbedUrl : '';
-        if (!currentVideoUrl && theme && theme.video_url) {
+        if (!currentVideoUrl && typeof theme !== 'undefined' && theme && theme.video_url) {
           const match = theme.video_url.match(/(?:v=|\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
           if (match && match[1]) {
             currentVideoUrl = 'https://www.youtube.com/embed/' + match[1];
           }
         }
+
+        const isLastModule = (typeof nextTheme === 'undefined' || !nextTheme);
       %>
 
-      <% if (currentVideoUrl || (typeof showCourseVideo !== 'undefined' && showCourseVideo)) { %>
+      <% if (isLastModule && (currentVideoUrl || (typeof showCourseVideo !== 'undefined' && showCourseVideo))) { %>
         <section class="card video-card" style="margin-top: 2rem; margin-bottom: 2rem;">
           <div class="video-header" style="margin-bottom: 1rem;">
             <div>
-              <span class="badge">Video del curso</span>
-              <h3 style="margin-top: 0.5rem; color: #fff;">Explicación visual de la lección</h3>
+              <span class="badge">Video de Cierre de Curso</span>
+              <h3 style="margin-top: 0.5rem; color: #fff;">Explicación visual final de la lección</h3>
             </div>
             <% if (typeof videoInfo !== 'undefined' && videoInfo && videoInfo.title) { %>
               <p class="muted"><%= videoInfo.title %></p>
