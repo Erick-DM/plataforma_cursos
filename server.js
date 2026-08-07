@@ -1024,6 +1024,6 @@ app.post('/admin/users/delete/:id', isAdmin, (req, res) => {
 // ==========================================
 // ARRANQUE DEL SERVIDOR
 // ==========================================
-app.listen(port, () => {
-  console.log(`Aplicación lista en http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Servidor activo en el puerto ${port}`);
 });
