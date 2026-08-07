@@ -1,4 +1,7 @@
-FROM node:18
+FROM node:22-alpine
+
+# Instalar herramientas de compilación necesarias para SQLite nativo en Alpine
+RUN apk add --no-cache python3 make g++ build-base
 
 WORKDIR /app
 
