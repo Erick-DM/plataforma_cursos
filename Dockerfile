@@ -1,10 +1,13 @@
 FROM node:18-alpine
 
+# Instalar herramientas de compilación necesarias para módulos nativos como better-sqlite3
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --production
+RUN npm install
 
 COPY . .
 
