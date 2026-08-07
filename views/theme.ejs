@@ -33,9 +33,24 @@
       </section>
 
       <!-- Contenido principal del módulo -->
-      <section class="card module-content-card">
-        <%- theme.info_html || theme.content %>
-      </section>
+<section class="card module-content-card">
+  <!-- 1. Texto de la lección (Limpio) -->
+  <div class="module-detail-rich">
+    <%- theme.info_html || theme.content %>
+  </div>
+
+  <!-- 2. Galería de Imágenes abajo del texto -->
+  <% if (theme.image1 || theme.image2) { %>
+    <div class="module-gallery" style="display: flex; gap: 1rem; margin-top: 2rem;">
+      <% if (theme.image1) { %>
+        <img src="<%= theme.image1 %>" alt="Imagen 1" class="module-image" style="width: 50%; border-radius: 8px;" loading="lazy" />
+      <% } %>
+      <% if (theme.image2) { %>
+        <img src="<%= theme.image2 %>" alt="Imagen 2" class="module-image" style="width: 50%; border-radius: 8px;" loading="lazy" />
+      <% } %>
+    </div>
+  <% } %>
+</section>
 
       <!-- SECCIÓN DE VIDEO: Solo visible en el ÚLTIMO módulo (!nextTheme) -->
       <% 

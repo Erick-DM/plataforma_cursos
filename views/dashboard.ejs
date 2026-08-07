@@ -30,9 +30,10 @@
           <% } %>
 
           <% if (user && (user.role === 'admin' || user.role === 'Admin')) { %>
-            <div class="inline-list" style="margin-top: 1rem;">
-              <a class="btn btn-primary" href="/admin/courses/new">Añadir curso</a>
-              <a class="btn" href="/admin/users" style="background: #3498db; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">⚙️ Control de Usuarios</a>
+            <div class="inline-list" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <a class="btn btn-primary" href="/admin/courses">⚙️ Gestionar Cursos</a>
+              <a class="btn btn-primary" href="/admin/courses/new">+ Añadir Curso</a>
+              <a class="btn" href="/admin/users" style="background: #3498db; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">👥 Control Usuarios</a>
             </div>
           <% } %>
         </div>
@@ -67,4 +68,4 @@
       </section>
     </main>
   </body>
-</html>
+</html>image.png

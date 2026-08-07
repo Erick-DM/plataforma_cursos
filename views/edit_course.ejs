@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> | Plataforma de cursos</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a class="brand" href="/admin/courses">Volver a gestión de cursos</a>
+        <div class="nav-links">
+          <a class="btn btn-secondary" href="/logout">Cerrar sesión</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" style="max-width: 600px; margin: 2rem auto;">
+      <div class="hero-card">
+        <span class="badge">Administrador</span>
+        <h1>Editar curso</h1>
+        <p class="muted">Actualiza los datos básicos del curso <%= course.title %></p>
+
+        <form action="/admin/courses/edit/<%= course.id %>" method="POST" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; text-align: left;">
+          <div>
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Título del curso</label>
+            <input type="text" name="title" value="<%= course.title %>" required style="width: 100%; padding: 0.75rem; background: #0b0f17; border: 1px solid #1f293d; color: #fff; border-radius: 6px;" />
+          </div>
+
+          <div>
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Identificador (Slug)</label>
+            <input type="text" name="slug" value="<%= course.slug %>" required style="width: 100%; padding: 0.75rem; background: #0b0f17; border: 1px solid #1f293d; color: #fff; border-radius: 6px;" />
+          </div>
+
+          <div>
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Descripción</label>
+            <textarea name="description" rows="4" required style="width: 100%; padding: 0.75rem; background: #0b0f17; border: 1px solid #1f293d; color: #fff; border-radius: 6px; resize: vertical;"><%= course.description %></textarea>
+          </div>
+
+          <div>
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Nivel</label>
+            <select name="level" style="width: 100%; padding: 0.75rem; background: #0b0f17; border: 1px solid #1f293d; color: #fff; border-radius: 6px;">
+              <option value="Básico" <%= course.level === 'Básico' ? 'selected' : '' %>>Básico</option>
+              <option value="Intermedio" <%= course.level === 'Intermedio' ? 'selected' : '' %>>Intermedio</option>
+              <option value="Avanzado" <%= course.level === 'Avanzado' ? 'selected' : '' %>>Avanzado</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Ruta de la imagen</label>
+            <input type="text" name="image" value="<%= course.image %>" required style="width: 100%; padding: 0.75rem; background: #0b0f17; border: 1px solid #1f293d; color: #fff; border-radius: 6px;" />
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 1rem; padding: 0.75rem;">Guardar Cambios</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

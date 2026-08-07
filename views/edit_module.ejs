@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> | Plataforma de cursos</title>
+  <link rel="stylesheet" href="/style.css" />
+  
+  <!-- TinyMCE CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Editor 1: Párrafos de la lección principal
+      tinymce.init({
+        selector: '#editor_content',
+        skin: "oxide-dark",
+        content_css: "dark",
+        height: 350,
+        menubar: false,
+        plugins: 'link code lists',
+        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link code',
+        setup: function (editor) {
+          editor.on('keyup change blur', function () { 
+            editor.save(); 
+          });
+        }
+      });
+
+      // Editor 2: Lista de conceptos clave
+      tinymce.init({
+        selector: '#editor_highlights',
+        skin: "oxide-dark",
+        content_css: "dark",
+        height: 200,
+        menubar: false,
+        plugins: 'lists',
+        toolbar: 'bold italic | bullist numlist',
+        setup: function (editor) {
+          editor.on('keyup change blur', function () { 
+            editor.save(); 
+          });
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a class="brand" href="/admin/courses/<%= course.id %>/modules">← Volver a los módulos</a>
+        <div class="nav-links">
+          <a class="btn btn-secondary" href="/logout">Cerrar sesión</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 900px; margin: 2rem auto;">
+    <section class="hero-card" style="padding: 2rem; background: #121824; border: 1px solid #1f293d; border-radius: 12px;">
+      <span class="badge">Editor de Contenido</span>
+      <h1 style="margin-top: 0.5rem;"><%= module.title %></h1>
+      <p class="muted">Curso: <%= course.title %> (Módulo <%= module.theme_order %>)</p>
+
+      <form action="/admin/modules/edit/<%= module.id %>" method="POST" style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem; text-align: left;">
+        
+        <!-- 1. Encabezado e Introducción -->
+        <div style="background: #0b0f17; padding: 1.25rem; border-radius: 8px; border: 1px solid #1f293d;">
+          <h3 style="margin-top: 0; color: #60a5fa; font-size: 1.05rem;">1. Encabezado e Introducción</h3>
+          
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Título del Módulo</label>
+            <input type="text" name="title" value="<%= module.title %>" required style="width: 100%; padding: 0.75rem; background: #121824; border: 1px solid #1f293d; color: #fff; border-radius: 6px;" />
+          </div>
+
+          <div>
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Resumen / Subtítulo Breve</label>
+            <textarea name="summary" rows="2" required style="width: 100%; padding: 0.75rem; background: #121824; border: 1px solid #1f293d; color: #fff; border-radius: 6px;"><%= module.summary %></textarea>
+          </div>
+        </div>
+
+        <!-- 2. Contenido del Módulo (Edición Separada) -->
+        <div style="background: #0b0f17; padding: 1.25rem; border-radius: 8px; border: 1px solid #1f293d;">
+          <h3 style="margin-top: 0; color: #60a5fa; font-size: 1.05rem;">2. Texto e Información Principal</h3>
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Contenido / Párrafos de la lección</label>
+            <!-- Muestra solo el texto limpio extraído del HTML -->
+            <textarea id="editor_content" name="content_text" rows="10" style="width: 100%;"><%- module.contentText %></textarea>
+          </div>
+
+          <h3 style="margin-top: 1rem; color: #60a5fa; font-size: 1.05rem;">3. Conceptos Clave</h3>
+          <div>
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">Viñetas / Puntos destacados</label>
+            <!-- Precarga las viñetas extraídas directamente del HTML almacenado -->
+            <textarea id="editor_highlights" name="highlights_text" rows="6" style="width: 100%;"><%- module.extractedHighlights %></textarea>
+          </div>
+        </div>
+
+        <!-- 3. Multimedia e Imágenes -->
+        <div style="background: #0b0f17; padding: 1.25rem; border-radius: 8px; border: 1px solid #1f293d;">
+          <h3 style="margin-top: 0; color: #60a5fa; font-size: 1.05rem;">4. Multimedia y Recursos</h3>
+
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">URL Imagen 1 (Galería)</label>
+            <input type="text" name="image1" value="<%= module.image1 || '' %>" placeholder="https://images.unsplash.com/..." style="width: 100%; padding: 0.75rem; background: #121824; border: 1px solid #1f293d; color: #fff; border-radius: 6px;" />
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">URL Imagen 2 (Galería)</label>
+            <input type="text" name="image2" value="<%= module.image2 || '' %>" placeholder="https://images.unsplash.com/..." style="width: 100%; padding: 0.75rem; background: #121824; border: 1px solid #1f293d; color: #fff; border-radius: 6px;" />
+          </div>
+
+          <div>
+            <label style="display: block; margin-bottom: 0.4rem; color: #ccc;">URL Video de YouTube</label>
+            <input type="text" name="video_url" value="<%= module.video_url || '' %>" placeholder="https://www.youtube.com/watch?v=..." style="width: 100%; padding: 0.75rem; background: #121824; border: 1px solid #1f293d; color: #fff; border-radius: 6px;" />
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+          <a href="/admin/courses/<%= course.id %>/modules" class="btn btn-secondary" style="text-decoration: none;">Cancelar</a>
+          <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">Guardar Cambios del Módulo</button>
+        </div>
+
+      </form>
+    </section>
+  </main>
+</body>
+</html>

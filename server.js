@@ -10,6 +10,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 const db = new Database(path.join(__dirname, 'database.sqlite'));
 
+// ==========================================
+// CONFIGURACIÓN DEL MOTOR DE PLANTILLAS Y MIDDLEWARES
+// ==========================================
 app.engine('ejs', (filePath, options, callback) => {
   ejs.renderFile(filePath, options, {}, callback);
 });
@@ -17,6 +20,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.resolve(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(session({
   secret: 'curso-unit4-2026',
   resave: false,
@@ -24,6 +28,7 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 8 }
 }));
 
+// Globalizar datos de usuario y mensajes de sesión a las vistas EJS
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.message = req.session.message || null;
@@ -31,6 +36,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// ==========================================
+// MIDDLEWARES DE AUTENTICACIÓN Y AUTORIZACIÓN
+// ==========================================
 const requireAuth = (req, res, next) => {
   if (!req.session.user) {
     req.session.message = 'Debes iniciar sesión para acceder al contenido.';
@@ -39,6 +47,17 @@ const requireAuth = (req, res, next) => {
   next();
 };
 
+const isAdmin = (req, res, next) => {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    req.session.message = 'Acceso denegado: Se requieren permisos de administrador.';
+    return res.redirect('/dashboard');
+  }
+  next();
+};
+
+// ==========================================
+// FUNCIONES AUXILIARES DE FORMATO
+// ==========================================
 const slugify = (value = '') => String(value)
   .toLowerCase()
   .normalize('NFKD')
@@ -53,6 +72,9 @@ const escapeHtml = (value = '') => String(value)
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
+// ==========================================
+// BANCO DE IMÁGENES Y GENERACIÓN DE CONTENIDO DE MÓDULOS
+// ==========================================
 const illustrationPool = {
   contenedores: [
     { url: 'https://images.unsplash.com/photo-1542223616-1b0b3f6f9f7c?auto=format&fit=crop&w=900&q=80', alt: 'Infraestructura basada en contenedores' },
@@ -98,7 +120,6 @@ const buildModuleContent = (courseSlug, module, index) => {
   const secondImage = pool[(index + 2) % pool.length];
   const pointsMarkup = (module.highlights || []).map((point) => `<li>${escapeHtml(point)}</li>`).join('');
 
-  // Generar 5 párrafos informativos con citas básicas (enlaces a documentación oficial)
   const topic = courseSlug || 'general';
   const citations = {
     contenedores: [
@@ -195,6 +216,9 @@ const buildModuleContent = (courseSlug, module, index) => {
   };
 };
 
+// ==========================================
+// DATOS INICIALES Y BANCO DE EVALUACIONES
+// ==========================================
 const courseSeed = [
   {
     slug: 'contenedores',
@@ -209,7 +233,7 @@ const courseSeed = [
       { title: 'Portabilidad', summary: 'Los contenedores hacen que la misma aplicación funcione de forma consistente en diferentes equipos.', outcome: 'Identificarás cómo la portabilidad mejora el despliegue entre entornos.', highlights: ['Evita diferencias entre máquinas', 'Reduce incidencias por entorno', 'Mejora la experiencia de desarrollo'], detailText: 'La portabilidad se convierte en un activo clave para equipos que trabajan con múltiples entornos, desde desarrollo hasta producción. En TI, este principio minimiza errores por diferencias de configuración y facilita la colaboración entre áreas.', videoUrl: '' },
       { title: 'Aislamiento y seguridad', summary: 'Cada contenedor funciona con su propio entorno y limita interferencias entre servicios.', outcome: 'Aprenderás a trabajar con menor riesgo y mejor control de dependencias.', highlights: ['Limita interacción entre procesos', 'Reduce riesgos de sobrecarga', 'Mejora separación lógica'], detailText: 'El aislamiento de procesos permite separar componentes y reducir los efectos colaterales de una falla. Este enfoque es relevante para la seguridad, el cumplimiento y la estabilidad de los servicios tecnológicos.', videoUrl: '' },
       { title: 'Trabajo con Docker', summary: 'Docker organiza la construcción, ejecución y publicación de contenedores con un flujo claro.', outcome: 'Dominarás los pasos básicos para crear y operar un contenedor.', highlights: ['Simplifica creación y ejecución', 'Organiza imagenes y contenedores', 'Acelera el intercambio de artefactos'], detailText: 'Docker permite estandarizar la manera en que se crean, ejecutan y comparten aplicaciones. Para los equipos de TI, representa una base prática para implementar pipelines más ágiles y menos propensos a errores humanos.', videoUrl: '' },
-      { title: 'Volúmenes y datos', summary: 'Los volúmenes permiten que la información persista más allá del ciclo de vida del contenedor.', outcome: 'Conocerás cómo proteger datos y compartir almacenamiento entre servicios.', highlights: ['Mantiene información persistente', 'Soporta cargas de trabajo reales', 'Evita pérdida tras reinicios'], detailText: 'Los volúmenes son cruciales cuando los servicios deben conservar información o compartirla entre instancias. En TI, este mecanismo mejora la continuidad operativa y reduce la pérdida de datos durante despliegues o reinicios.', videoUrl: '' },
+      { title: 'Volúmenes y datos', summary: 'Los volúmenes permiten que la información persista más allá del ciclo de vida del contenedor.', outcome: 'Conocerás cómo proteger datos y compartir almacenamiento entre servicios.', highlights: ['Mantiene información persistent', 'Soporta cargas de trabajo reales', 'Evita pérdida tras reinicios'], detailText: 'Los volúmenes son cruciales cuando los servicios deben conservar información o compartirla entre instancias. En TI, este mecanismo mejora la continuidad operativa y reduce la pérdida de datos durante despliegues o reinicios.', videoUrl: '' },
       { title: 'Redes de contenedores', summary: 'Los contenedores pueden comunicarse entre sí mediante redes definidas por el motor.', outcome: 'Entenderás cómo conectar microservicios y aislar tráfico interno.', highlights: ['Conecta componentes de forma segura', 'Facilita comunicación entre servicios', 'Simplifica topologías de prueba'], detailText: 'La red entre contenedores facilita el diseño de arquitecturas distribuidas y servicios conectados. En ambientes empresariales, este conocimiento ayuda a modelar tránsito seguro entre componentes y a mejorar la observabilidad.', videoUrl: '' },
       { title: 'Integración continua', summary: 'Los contenedores facilitan pipelines ágiles y despliegues automatizados.', outcome: 'Identificarás cómo integrar la entrega continua con el desarrollo de software.', highlights: ['Acelera validación de cambios', 'Reduce errores manuales', 'Mejora despliegues repetibles'], detailText: 'La integración continua aprovecha contenedores para validar cambios con mayor rapidez y consistencia. En TI, este enfoque permite reducir errores manuales y publicar nuevas versiones con mayor frecuencia.', videoUrl: '' },
       { title: 'Buenas prácticas', summary: 'Mantener imágenes pequeñas, seguras y reproducibles es esencial para un despliegue profesional.', outcome: 'Aplicarás criterios de calidad para construir contenedores confiables.', highlights: ['Optimiza tamaño final', 'Refuerza seguridad', 'Asegura consistencia en producción'], detailText: 'Las buenas prácticas permiten que los contenedores sean mantenibles, seguros y eficientes en producción. Este módulo orienta a los estudiantes a diseñar soluciones que cumplan con estándares operativos reales.', videoUrl: 'https://www.youtube.com/watch?v=gjRoNFopFig&t=236s' }
@@ -387,6 +411,9 @@ const quizBank = {
   ]
 };
 
+// ==========================================
+// INICIALIZACIÓN Y ESQUEMA DE BASE DE DATOS
+// ==========================================
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -438,6 +465,7 @@ db.exec(`
   );
 `);
 
+// Migraciones dinámicas para garantizar compatibilidad con versiones previas
 const ensureThemeColumns = () => {
   const columnsToAdd = [
     ['content', 'TEXT'],
@@ -453,7 +481,7 @@ const ensureThemeColumns = () => {
     try {
       db.exec(`ALTER TABLE themes ADD COLUMN ${columnName} ${columnType}`);
     } catch (error) {
-      // Las columnas ya existen en bases previas.
+      // La columna ya existe
     }
   });
 };
@@ -462,18 +490,19 @@ const ensureUserColumns = () => {
   try {
     db.exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'student'");
   } catch (error) {
-    // La columna ya existe en bases previas.
+    // La columna ya existe
   }
   try {
     db.prepare("UPDATE users SET role = 'admin' WHERE role IS NULL OR role = ''").run();
   } catch (error) {
-    // Ignorar si la tabla aún no tiene registros.
+    // Omitir si la tabla está vacía
   }
 };
 
 ensureThemeColumns();
 ensureUserColumns();
 
+// Poblado automático de cursos y temas por defecto
 const seedData = () => {
   const insertCourse = db.prepare(`INSERT INTO courses (slug, title, description, image, course_order, level) VALUES (?, ?, ?, ?, ?, ?)`);
   const updateCourse = db.prepare(`UPDATE courses SET title = ?, description = ?, image = ?, course_order = ?, level = ? WHERE slug = ?`);
@@ -504,12 +533,16 @@ const seedData = () => {
 
 seedData();
 
+// ==========================================
+// CONSULTAS REUTILIZABLES DE BASE DE DATOS
+// ==========================================
 const getAllCourses = () => db.prepare('SELECT * FROM courses ORDER BY course_order').all();
 const getCourseById = (courseId) => db.prepare('SELECT * FROM courses WHERE id = ?').get(courseId);
 const getCourseBySlug = (slug) => db.prepare('SELECT * FROM courses WHERE slug = ?').get(slug);
 const getThemesForCourse = (courseId) => db.prepare('SELECT id, course_id, title, content, video_url, theme_order, summary, info_html, image1, image2 FROM themes WHERE course_id = ? ORDER BY theme_order').all(courseId);
 const getThemeById = (themeId) => db.prepare('SELECT id, course_id, title, content, video_url, theme_order, summary, info_html, image1, image2 FROM themes WHERE id = ?').get(themeId);
 const getUserCourseProgress = (userId, courseId) => db.prepare('SELECT * FROM user_course_progress WHERE user_id = ? AND course_id = ?').get(userId, courseId);
+
 const getViewedThemesCount = (userId, courseId) => {
   const themes = getThemesForCourse(courseId);
   if (!themes.length) return 0;
@@ -518,6 +551,7 @@ const getViewedThemesCount = (userId, courseId) => {
   const row = db.prepare(`SELECT COUNT(*) as count FROM user_theme_progress WHERE user_id = ? AND theme_id IN (${placeholders})`).get(userId, ...ids);
   return row.count;
 };
+
 const getCourseAccess = (userId, courseId) => {
   const course = getCourseById(courseId);
   if (!course) return { allowed: false, reason: 'Curso no encontrado' };
@@ -533,6 +567,9 @@ const getCourseAccess = (userId, courseId) => {
   return { allowed: true, reason: 'Acceso habilitado' };
 };
 
+// ==========================================
+// RUTAS PÚBLICAS Y DE AUTENTICACIÓN
+// ==========================================
 app.get('/', (req, res) => {
   res.render('home', { title: 'Inicio' });
 });
@@ -579,6 +616,9 @@ app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
+// ==========================================
+// RUTAS DEL ESTUDIANTE (PANEL Y CURSOS)
+// ==========================================
 app.get('/dashboard', requireAuth, (req, res) => {
   const courses = getAllCourses();
   const enriched = courses.map((course) => {
@@ -631,9 +671,7 @@ const getYouTubeVideoInfo = (videoUrl) => {
   return new Promise((resolve) => {
     https.get(oembedUrl, (response) => {
       let body = '';
-      response.on('data', (chunk) => {
-        body += chunk;
-      });
+      response.on('data', (chunk) => { body += chunk; });
       response.on('end', () => {
         try {
           const parsed = JSON.parse(body);
@@ -662,8 +700,8 @@ app.get('/themes/:themeId', requireAuth, async (req, res) => {
   const previousTheme = index > 0 ? themes[index - 1] : null;
   const nextTheme = index < themes.length - 1 ? themes[index + 1] : null;
   const totalThemes = themes.length;
-  const viewedThemesBefore = getViewedThemesCount(req.session.user.id, course.id);
-  const insertResult = db.prepare('INSERT OR IGNORE INTO user_theme_progress (user_id, theme_id) VALUES (?, ?)').run(req.session.user.id, theme.id);
+
+  db.prepare('INSERT OR IGNORE INTO user_theme_progress (user_id, theme_id) VALUES (?, ?)').run(req.session.user.id, theme.id);
   const viewedThemesAfter = getViewedThemesCount(req.session.user.id, course.id);
   const progressAfterPercent = totalThemes ? Math.round((viewedThemesAfter / totalThemes) * 100) : 0;
   const showCourseVideo = index === themes.length - 2;
@@ -727,21 +765,14 @@ app.post('/courses/:courseId/quiz', requireAuth, (req, res) => {
   res.render('quiz', { title: `Evaluación de ${course.title}`, course, questions, result, modalOpen: true });
 });
 
-app.get('/admin/courses/new', requireAuth, (req, res) => {
-  if (req.session.user.role !== 'admin') {
-    req.session.message = 'Solo los administradores pueden crear cursos.';
-    return res.redirect('/dashboard');
-  }
-
+// ==========================================
+// RUTAS DE ADMINISTRACIÓN: GESTIÓN DE CURSOS Y MÓDULOS
+// ==========================================
+app.get('/admin/courses/new', isAdmin, (req, res) => {
   res.render('add_course', { title: 'Agregar curso' });
 });
 
-app.post('/admin/courses', requireAuth, (req, res) => {
-  if (req.session.user.role !== 'admin') {
-    req.session.message = 'Solo los administradores pueden crear cursos.';
-    return res.redirect('/dashboard');
-  }
-
+app.post('/admin/courses', isAdmin, (req, res) => {
   const title = (req.body.title || '').trim();
   const description = (req.body.description || '').trim();
   const level = (req.body.level || 'Básico').trim();
@@ -777,48 +808,222 @@ app.post('/admin/courses', requireAuth, (req, res) => {
   db.prepare('INSERT INTO themes (course_id, title, content, video_url, theme_order, summary, info_html, image1, image2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
     .run(courseRecord.id, defaultModule.title, builtModule.summary, builtModule.video_url, 1, builtModule.summary, builtModule.info_html, builtModule.image1, builtModule.image2);
 
-    req.session.message = 'Curso creado correctamente.';
-    return res.redirect('/dashboard');
-    });
-    
-    // ==========================================
-    // RUTAS DE ADMINISTRACIÓN: CONTROL DE USUARIOS
-    // ==========================================
-    
-    // 1. Mostrar la lista de usuarios
-    app.get('/admin/users', (req, res) => {
-      const users = db.prepare('SELECT id, name, email, role FROM users').all();
-      res.render('users_control', { users });
-    });
-    
-    // 2. Actualizar datos, rol o contraseña de un usuario
-    app.post('/admin/users/update/:id', (req, res) => {
-      const { id } = req.params;
-      const { name, email, role, new_password } = req.body;
-    
-      if (new_password && new_password.trim() !== '') {
-        const hashedPassword = bcrypt.hashSync(new_password.trim(), 10);
-        db.prepare('UPDATE users SET name = ?, email = ?, role = ?, password = ? WHERE id = ?')
-          .run(name, email.toLowerCase(), role, hashedPassword, id);
-      } else {
-        db.prepare('UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?')
-          .run(name, email.toLowerCase(), role, id);
-      }
-    
-      res.redirect('/admin/users');
-    });
-    
-    // 3. Eliminar usuario
-    app.post('/admin/users/delete/:id', (req, res) => {
-      const { id } = req.params;
-      db.prepare('DELETE FROM users WHERE id = ?').run(id);
-      res.redirect('/admin/users');
-    });
-    
-    app.listen(port, () => {
-      console.log(`Aplicación lista en http://localhost:${port}`);
-    });
+  req.session.message = 'Curso creado correctamente.';
+  res.redirect('/dashboard');
+});
 
+// Vista principal del panel de administración de cursos
+app.get('/admin/courses', isAdmin, (req, res) => {
+  const courses = getAllCourses();
+  res.render('admin_courses', { title: 'Gestión de Cursos', courses });
+});
+
+// Formulario para editar un curso
+app.get('/admin/courses/edit/:id', isAdmin, (req, res) => {
+  const course = getCourseById(parseInt(req.params.id, 10));
+  if (!course) {
+    req.session.message = 'Curso no encontrado.';
+    return res.redirect('/admin/courses');
+  }
+  res.render('edit_course', { title: `Editar: ${course.title}`, course });
+});
+
+// Guardar cambios de un curso
+app.post('/admin/courses/edit/:id', isAdmin, (req, res) => {
+  const courseId = parseInt(req.params.id, 10);
+  const { title, slug, description, level, image } = req.body;
+  const finalSlug = slugify(slug || title);
+
+  try {
+    db.prepare(`
+      UPDATE courses 
+      SET title = ?, slug = ?, description = ?, level = ?, image = ? 
+      WHERE id = ?
+    `).run(title.trim(), finalSlug, description.trim(), level, image.trim(), courseId);
+
+    req.session.message = 'Curso actualizado correctamente.';
+  } catch (err) {
+    req.session.message = 'Error al actualizar el curso (el identificador debe ser único).';
+  }
+
+  res.redirect('/admin/courses');
+});
+
+// Eliminar curso y sus relaciones en cascada
+app.post('/admin/courses/delete/:id', isAdmin, (req, res) => {
+  const courseId = parseInt(req.params.id, 10);
+
+  const deleteTransaction = db.transaction(() => {
+    db.prepare('DELETE FROM user_theme_progress WHERE theme_id IN (SELECT id FROM themes WHERE course_id = ?)').run(courseId);
+    db.prepare('DELETE FROM user_course_progress WHERE course_id = ?').run(courseId);
+    db.prepare('DELETE FROM themes WHERE course_id = ?').run(courseId);
+    db.prepare('DELETE FROM courses WHERE id = ?').run(courseId);
+  });
+
+  try {
+    deleteTransaction();
+    req.session.message = 'Curso y sus módulos eliminados con éxito.';
+  } catch (err) {
+    console.error(err);
+    req.session.message = 'Ocurrió un error al intentar eliminar el curso.';
+  }
+
+  res.redirect('/admin/courses');
+});
+
+// Ver módulos asignados a un curso
+app.get('/admin/courses/:id/modules', isAdmin, (req, res) => {
+  const courseId = parseInt(req.params.id, 10);
+  const course = getCourseById(courseId);
+  if (!course) return res.redirect('/admin/courses');
+
+  const modules = getThemesForCourse(courseId);
+  res.render('admin_modules', { title: `Módulos: ${course.title}`, course, modules });
+});
+
+// GET: Renderizar formulario de edición de un módulo con extracción limpia
+// GET: Renderizar formulario de edición de un módulo con extracción limpia
+app.get('/admin/modules/edit/:id', isAdmin, (req, res) => {
+  const moduleId = parseInt(req.params.id, 10);
+  const module = getThemeById(moduleId);
+
+  if (!module) {
+    req.session.message = 'Módulo no encontrado.';
+    return res.redirect('/admin/courses');
+  }
+
+  const course = getCourseById(module.course_id);
+
+  // 1. Extraer párrafos de texto
+  let bodyText = module.info_html || module.content || '';
+  const richMatch = bodyText.match(/<div class="module-detail-rich">([\s\S]*?)<\/div>/i);
+  if (richMatch && richMatch[1]) {
+    bodyText = richMatch[1].trim();
+  } else {
+    // Si ya no tiene la clase wrappeadora, limpiamos la sección de highlights e imágenes
+    bodyText = bodyText
+      .replace(/<div class="module-highlights"[\s\S]*?<\/div>/gi, '')
+      .replace(/<div class="module-gallery"[\s\S]*?<\/div>/gi, '')
+      .replace(/<img[^>]*>/gi, '')
+      .trim();
+  }
+
+  // 2. Extraer puntos destacados de la lista HTML
+  let extractedHighlights = '';
+  const pointsMatch = (module.info_html || '').match(/<ul class="module-points">([\s\S]*?)<\/ul>/i) || 
+                       (module.info_html || '').match(/<div class="module-highlights">([\s\S]*?)<\/div>/i);
+
+  if (pointsMatch && pointsMatch[1]) {
+    extractedHighlights = pointsMatch[1].replace(/<h4>.*?<\/h4>/gi, '').trim();
+    if (!extractedHighlights.startsWith('<ul')) {
+      extractedHighlights = `<ul>${extractedHighlights}</ul>`;
+    }
+  }
+
+  res.render('edit_module', {
+    title: `Editar Módulo: ${module.title}`,
+    course,
+    module: {
+      ...module,
+      contentText: bodyText,
+      extractedHighlights: extractedHighlights
+    }
+  });
+});
+
+// POST: Guardar cambios del módulo reestructurando info_html sin duplicar imágenes
+// POST: Guardar cambios del módulo manteniendo contenedores para subsiguientes ediciones
+app.post('/admin/modules/edit/:id', isAdmin, (req, res) => {
+  const moduleId = parseInt(req.params.id, 10);
+  const { title, summary, content_text, highlights_text, image1, image2, video_url } = req.body;
+
+  const module = getThemeById(moduleId);
+  if (!module) return res.redirect('/admin/courses');
+
+  // Limpiar el contenido enviado
+  let cleanContent = (content_text || '')
+    .replace(/<div class="module-gallery"[\s\S]*?<\/div>/gi, '')
+    .replace(/<img[^>]*>/gi, '')
+    .trim();
+
+  // Asegurar la envoltura de la lista de conceptos clave
+  let cleanHighlights = (highlights_text || '').trim();
+  if (cleanHighlights && !cleanHighlights.includes('class="module-points"')) {
+    cleanHighlights = cleanHighlights.replace(/<ul/i, '<ul class="module-points"');
+  }
+
+  // Estructurar el HTML completo
+  let updatedInfoHtml = `
+    <div class="module-detail-rich">
+      ${cleanContent}
+    </div>
+  `;
+
+  if (cleanHighlights) {
+    updatedInfoHtml += `
+      <div class="module-highlights">
+        <h4>Conceptos clave</h4>
+        ${cleanHighlights}
+      </div>
+    `;
+  }
+
+  db.prepare(`
+    UPDATE themes 
+    SET title = ?, summary = ?, content = ?, info_html = ?, image1 = ?, image2 = ?, video_url = ? 
+    WHERE id = ?
+  `).run(
+    title.trim(), 
+    summary.trim(), 
+    cleanContent, 
+    updatedInfoHtml,
+    image1 ? image1.trim() : '', 
+    image2 ? image2.trim() : '', 
+    video_url ? video_url.trim() : '', 
+    moduleId
+  );
+
+  req.session.message = 'Módulo actualizado correctamente.';
+  res.redirect(`/admin/courses/${module.course_id}/modules`);
+});
+
+// ==========================================
+// RUTAS DE ADMINISTRACIÓN: CONTROL DE USUARIOS
+// ==========================================
+
+// Mostrar lista completa de usuarios registrados (Protegido con isAdmin)
+app.get('/admin/users', isAdmin, (req, res) => {
+  const users = db.prepare('SELECT id, name, email, role FROM users').all();
+  res.render('users_control', { users });
+});
+
+// Actualizar datos, rol o contraseña de un usuario (Protegido con isAdmin)
+app.post('/admin/users/update/:id', isAdmin, (req, res) => {
+  const { id } = req.params;
+  const { name, email, role, new_password } = req.body;
+
+  if (new_password && new_password.trim() !== '') {
+    const hashedPassword = bcrypt.hashSync(new_password.trim(), 10);
+    db.prepare('UPDATE users SET name = ?, email = ?, role = ?, password = ? WHERE id = ?')
+      .run(name.trim(), email.toLowerCase().trim(), role, hashedPassword, id);
+  } else {
+    db.prepare('UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?')
+      .run(name.trim(), email.toLowerCase().trim(), role, id);
+  }
+
+  res.redirect('/admin/users');
+});
+
+// Eliminar un usuario del sistema (Protegido con isAdmin)
+app.post('/admin/users/delete/:id', isAdmin, (req, res) => {
+  const { id } = req.params;
+  db.prepare('DELETE FROM users WHERE id = ?').run(id);
+  res.redirect('/admin/users');
+});
+
+// ==========================================
+// ARRANQUE DEL SERVIDOR
+// ==========================================
 app.listen(port, () => {
   console.log(`Aplicación lista en http://localhost:${port}`);
 });
