@@ -10,15 +10,20 @@
 <body>
   <header>
     <div class="container">
-      <nav>
-        <a class="brand" href="/admin/courses">Volver a gestión de cursos</a>
-        <div class="nav-links">
-          <a class="btn btn-secondary" href="/logout">Cerrar sesión</a>
+      <nav style="display: flex; align-items: center; justify-content: space-between;">
+        
+        <!-- Logo y Nombre que redirigen al Dashboard al hacer clic -->
+        <a class="brand" href="/dashboard" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff;">
+          <img src="/images/logo_cursdev.png" alt="Logo CRUSDEV" style="height: 32px; width: auto;" />
+          <span style="font-weight: bold; font-size: 1.2rem; letter-spacing: 1px;">CURSDEV</span>
+        </a>
+  
+          <!-- Si tienes botón de salir -->
+          <a class="btn btn-danger" href="/logout">Salir</a>
         </div>
       </nav>
     </div>
   </header>
-
   <main class="container">
     <section class="hero" style="margin-bottom: 2rem;">
       <div class="hero-card">
